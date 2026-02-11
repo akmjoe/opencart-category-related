@@ -13,6 +13,7 @@ class ControllerExtensionModuleCategoryRelated extends Controller {
 			$this->model_setting_setting->editSetting('module_category_related', $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
+                        $this->update();
 
 			$this->response->redirect($this->url->link('marketplace/extension', 'user_token=' . $this->session->data['user_token'] . '&type=module', true));
 		}
@@ -68,15 +69,20 @@ class ControllerExtensionModuleCategoryRelated extends Controller {
 		$this->load->model('extension/module/category_related');
 		$this->model_extension_module_category_related->install();
 		// set up event handlers
-		$this->load->model('setting/event');
-		// Modify admin page
-		$this->model_setting_event->addEvent('category_related', 'admin/view/catalog/category_form/after', 'extension/event/category_related/view');
-		$this->model_setting_event->addEvent('category_related', 'admin/model/catalog/category/addCategory/after', 'extension/event/category_related/save');
-		$this->model_setting_event->addEvent('category_related', 'admin/model/catalog/category/editCategory/after', 'extension/event/category_related/save');
-		$this->model_setting_event->addEvent('category_related', 'admin/model/catalog/category/deleteCategory/after', 'extension/event/category_related/delete');
-		// Modify catalog page
-		$this->model_setting_event->addEvent('category_related', 'catalog/model/catalog/product/getProductRelated/after', 'extension/event/category_related/productRelated');
+		$this->update();
 	}
+        
+        public function update() {
+            // we just need to re-do the events
+            $this->load->model('setting/event');
+            $this->model_setting_event->deleteEventByCode('category_related');
+            $this->model_setting_event->addEvent('category_related', 'admin/view/catalog/category_form/before', 'extension/event/category_related/view');
+            $this->model_setting_event->addEvent('category_related', 'admin/model/catalog/category/addCategory/after', 'extension/event/category_related/save');
+            $this->model_setting_event->addEvent('category_related', 'admin/model/catalog/category/editCategory/after', 'extension/event/category_related/save');
+            $this->model_setting_event->addEvent('category_related', 'admin/model/catalog/category/deleteCategory/after', 'extension/event/category_related/delete');
+            // Modify catalog page
+            $this->model_setting_event->addEvent('category_related', 'catalog/model/catalog/product/getProductRelated/after', 'extension/event/category_related/productRelated');
+        }
 	
 	public function uninstall() {
 		// remove db table
