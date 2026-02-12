@@ -19,11 +19,11 @@ class controllerExtensionEventCategoryRelated extends Controller {
 			$info = $this->request->post['product_related'];
 		}
 
-		$this->language->load('extension/module/category_related');
+		$this->language->load('extension/module/category_related', 'category_related');
                 // set data parameters
                 $data['category_related_key'] = $this->config->get('module_category_related_key');
-                $data['entry_related'] = $this->language->get('entry_related');
-                $data['help_related'] = $this->language->get('help_related');
+                $data['entry_related'] = $this->language->get('category_related')->get('entry_related');
+                $data['help_related'] = $this->language->get('category_related')->get('help_related');
                 foreach($info as $related) {
 			$result = $this->model_catalog_product->getProduct($related);
                         $data['product_related'][$related] = $result[$this->config->get('module_category_related_key')];
